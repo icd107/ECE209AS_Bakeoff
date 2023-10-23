@@ -85,4 +85,7 @@ public class MLClassifier {
         }
     }
     
+    public void addData(double[] valueArray, String label) {
+    	
+    }
 }

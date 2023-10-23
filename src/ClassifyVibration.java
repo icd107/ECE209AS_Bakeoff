@@ -164,7 +164,6 @@ public class ClassifyVibration extends PApplet {
 		}
 		
 		
-		
 		// Load previously trained model
 		else if (key == 'l') {                        
 			String line = "";
@@ -179,8 +178,7 @@ public class ClassifyVibration extends PApplet {
 					for (int i = 1; i < data.length - 1; i++) {
 						doubledata[i] = data[i];
 					}
-					
-					Instance trainingData = classifier.featureCalc.instanceFromArray(doubledata, label);
+					classifier.addData(doubledata, label);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
