@@ -163,6 +163,8 @@ public class ClassifyVibration extends PApplet {
 			}
 		}
 		
+		
+		
 		// Load previously trained model
 		else if (key == 'l') {                        
 			String line = "";
