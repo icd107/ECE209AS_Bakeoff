@@ -28,7 +28,7 @@ public class ClassifyVibration extends PApplet {
 	float[] fftFeatures = new float[bands];
 	
 	// Change class names for vibration: quiet, knocking, etc.
-	String[] classNames = {"quiet", "hand drill", "whistling", "class clapping"};
+	String[] classNames = {"Neutral", "One", "Three"};
 	int classIndex = 0;
 	int dataCount = 0;
 
@@ -117,6 +117,9 @@ public class ClassifyVibration extends PApplet {
 			// Yang: add code to stabilize your classification results
 			
 			text("classified as: " + guessedLabel, 20, 30);
+			if(guessedLabel != "Neutral") {
+				System.out.println(guessedLabel);
+			}
 		} else {
 			text(classNames[classIndex], 20, 30);
 			dataCount = trainingData.get(classNames[classIndex]).size();
@@ -171,24 +174,42 @@ public class ClassifyVibration extends PApplet {
 				BufferedReader br = new BufferedReader(new FileReader(fileName));
 				while((line = br.readLine()) != null) {
 					String[] dataInstance = line.split(delimiter);
-					int s = dataInstance.length;
 					String label = dataInstance[dataInstance.length - 1];
-					double[] data = Arrays.stream(dataInstance).mapToDouble(Double::parseDouble).toArray();
-					double[] doubledata = new double[data.length - 1];
-					for (int i = 1; i < data.length - 1; i++) {
-						doubledata[i] = data[i];
+					double[] doubledata = new double[dataInstance.length - 1];
+					for (int i = 1; i < dataInstance.length - 1; i++) {
+						doubledata[i - 1] = Double.parseDouble(dataInstance[i]);
 					}
-					classifier.addData(doubledata, label);
+
+					DataInstance res = new DataInstance();
+					res.label = label;
+					
+					float[] floatdata = new float[doubledata.length];
+					for(int x = 0; x < doubledata.length; x++) {
+						floatdata[x] = (float) doubledata[x];
+					}
+					res.measurements = floatdata;
+					
+					trainingData.get(label).add(res);
+					br.close();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			
+			if(classifier == null) {
+				println("Start training ...");
+				classifier = new MLClassifier();
+				classifier.train(trainingData);
+			}else {
+				classifier = null;
+			}
+			System.out.println("Load complete!");
 		}
 			
 		else {
 			trainingData.get(classNames[classIndex]).add(captureInstance(classNames[classIndex]));
 		}
+		
 	}
 
 }
