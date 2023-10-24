@@ -55,22 +55,21 @@ public class ClassifyVibration extends PApplet {
 		return res;
 	}
 	
-	public String findMode(ArrayList<String> values) {
-		if (values.size() == 0) {	//edge case of all neutral values
-			return "No Action Detected";
+	public String findMode(ArrayList<String> actions) {
+		HashMap<String, Integer> frequencyMap = new HashMap<>();
+		int maxFrequency = 0;
+		String mostCommon = null;
+	
+		for (String value : actions) {
+			int frequency = frequencyMap.getOrDefault(value, 0) + 1;
+			frequencyMap.put(value, frequency);
+	
+			if (frequency > maxFrequency) {
+				maxFrequency = frequency;
+				mostCommon = value;
+			}
 		}
-		
-		String mostFound = "";
-		int[] classifications = {0, 0};
-		for (String i : values) {
-			if (i == "Scratch") {classifications[0] = classifications[0] + 1;}
-			else if (i == "Tap") {classifications[1] = classifications[1] + 1;}
-		}
-		if (classifications[0] > classifications[1]) {mostFound = "Scratch";}
-		else if (classifications[0] < classifications[1]) {mostFound = "Tap";}
-		else {mostFound = "Tap";}	//default to tap in case that there is a tie since it is less reliable than scratch. Wrote separately to make updating edge case easier
-		
-		return mostFound;
+		return mostCommon;
 	}
 	
 	public static void main(String[] args) {
