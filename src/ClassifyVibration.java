@@ -202,26 +202,27 @@ public class ClassifyVibration extends PApplet {
 		
 		
 		// Load previously trained model
-		else if (key == 'l') {                        
+		else if (key == 'l') {    
+			System.out.println("Loading!");
 			String line = "";
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(fileName));
 				while((line = br.readLine()) != null) {
-					String[] dataInstance = line.split(delimiter);
-					System.out.println(line);
+					line = line.substring(1);
+					String[] dataInstance = line.split(",");
 					String label = dataInstance[dataInstance.length - 1];
 					float[] floatdata = new float[dataInstance.length - 2];
 					for (int i = 1; i < dataInstance.length - 1; i++) {
 						floatdata[i - 1] = Float.parseFloat(dataInstance[i]);
 					}
-
 					DataInstance res = new DataInstance();
 					res.label = label;
 					res.measurements = floatdata;
 					
 					trainingData.get(label).add(res);
-					br.close();
+					
 				}
+				br.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
