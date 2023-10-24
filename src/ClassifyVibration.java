@@ -28,13 +28,18 @@ public class ClassifyVibration extends PApplet {
 	float[] fftFeatures = new float[bands];
 	
 	// Change class names for vibration: quiet, knocking, etc.
-	String[] classNames = {"Neutral", "One", "Three"};
+	String[] classNames = {"Neutral", "Scratch", "Tap"};
 	int classIndex = 0;
 	int dataCount = 0;
 
 	MLClassifier classifier;
 	String fileName = "test.csv";
 	String delimiter = ",";
+	
+	/*variables for space bar data collection */
+	boolean collectData = false;
+	ArrayList<String> dataCollected = new ArrayList<String>();
+	ArrayList<String> results = new ArrayList<String>();
 	
 	Map<String, List<DataInstance>> trainingData = new HashMap<>();
 	{
@@ -48,6 +53,24 @@ public class ClassifyVibration extends PApplet {
 		res.label = label;
 		res.measurements = fftFeatures.clone();
 		return res;
+	}
+	
+	public String findMode(ArrayList<String> values) {
+		if (values.size() == 0) {	//edge case of all neutral values
+			return "No Action Detected";
+		}
+		
+		String mostFound = "";
+		int[] classifications = {0, 0};
+		for (String i : values) {
+			if (i == "Scratch") {classifications[0] = classifications[0] + 1;}
+			else if (i == "Tap") {classifications[1] = classifications[1] + 1;}
+		}
+		if (classifications[0] > classifications[1]) {mostFound = "Scratch";}
+		else if (classifications[0] < classifications[1]) {mostFound = "Tap";}
+		else {mostFound = "Tap";}	//default to tap in case that there is a tie since it is less reliable than scratch. Wrote separately to make updating edge case easier
+		
+		return mostFound;
 	}
 	
 	public static void main(String[] args) {
@@ -116,11 +139,22 @@ public class ClassifyVibration extends PApplet {
 			
 			// Yang: add code to stabilize your classification results
 			
-			text("classified as: " + guessedLabel, 20, 30);
-			if(guessedLabel != "Neutral") {
-				System.out.println(guessedLabel);
+			if (collectData == false) {
+				text("Press space bar to start recording data", 20, 30);
 			}
-		} else {
+			
+			if ((collectData == true)) {	//space bar pressed the first time, start collecting data
+				text("Now collecting data", 20, 30);
+				if (guessedLabel != "Neutral") {
+					dataCollected.add(guessedLabel);
+				}
+			}
+			
+//			text("classified as: " + guessedLabel, 20, 30);
+//			if(guessedLabel != "Neutral") {
+//				System.out.println(guessedLabel);
+			}
+		else {
 			text(classNames[classIndex], 20, 30);
 			dataCount = trainingData.get(classNames[classIndex]).size();
 			text("Data collected: " + dataCount, 20, 60);
@@ -201,7 +235,22 @@ public class ClassifyVibration extends PApplet {
 			}
 			System.out.println("Load complete!");
 		}
-			
+		else if (key == ' ') {
+			if (collectData == false) {collectData = true;}	//start collecting data
+			else {	//stop collecting data, call findMode function, store result & output results
+				collectData = false;	//stop collecting data
+				results.add(findMode(dataCollected));	//add classification result to results array
+				int results_size = results.size();
+				for (int i = 0; i < results_size; i++) {	//print results array each time
+					System.out.print("The classification of trial ");
+					System.out.print(i);
+					System.out.print(": ");
+					System.out.println(results.get(i));
+				}
+				System.out.println("-----------------------------------------------------");
+				dataCollected.clear();
+				}
+		}
 		else {
 			trainingData.get(classNames[classIndex]).add(captureInstance(classNames[classIndex]));
 		}
