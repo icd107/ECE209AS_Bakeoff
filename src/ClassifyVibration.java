@@ -33,7 +33,8 @@ public class ClassifyVibration extends PApplet {
 	int dataCount = 0;
 
 	MLClassifier classifier;
-	String fileName = "test.csv";
+	String saveFileName = "test2.csv";
+	String loadFileName = "test.csv";
 	String delimiter = ",";
 	
 	/*variables for space bar data collection */
@@ -68,7 +69,12 @@ public class ClassifyVibration extends PApplet {
 		}
 		if (classifications[0] > classifications[1]) {mostFound = "Scratch";}
 		else if (classifications[0] < classifications[1]) {mostFound = "Tap";}
-		else {mostFound = "Tap";}	//default to tap in case that there is a tie since it is less reliable than scratch. Wrote separately to make updating edge case easier
+		else {
+			//mostFound = "Tap";
+			mostFound = "Neutral";
+			}	//default to tap in case that there is a tie since it is less reliable than scratch. Wrote separately to make updating edge case easier
+		
+		System.out.println(classifications[0] + " " + classifications[1]);
 		
 		return mostFound;
 	}
@@ -183,7 +189,7 @@ public class ClassifyVibration extends PApplet {
 		else if (key == 's') {
 			System.out.println("Saving file");
 			
-			File csvFile = new File(fileName);
+			File csvFile = new File(saveFileName);
 			FileWriter fileWriter;
 			try {
 				fileWriter = new FileWriter(csvFile);
@@ -206,7 +212,7 @@ public class ClassifyVibration extends PApplet {
 			System.out.println("Loading!");
 			String line = "";
 			try {
-				BufferedReader br = new BufferedReader(new FileReader(fileName));
+				BufferedReader br = new BufferedReader(new FileReader(loadFileName));
 				while((line = br.readLine()) != null) {
 					line = line.substring(1);
 					String[] dataInstance = line.split(",");
