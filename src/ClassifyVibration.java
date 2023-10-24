@@ -174,19 +174,15 @@ public class ClassifyVibration extends PApplet {
 				BufferedReader br = new BufferedReader(new FileReader(fileName));
 				while((line = br.readLine()) != null) {
 					String[] dataInstance = line.split(delimiter);
+					System.out.println(line);
 					String label = dataInstance[dataInstance.length - 1];
-					double[] doubledata = new double[dataInstance.length - 1];
+					float[] floatdata = new float[dataInstance.length - 2];
 					for (int i = 1; i < dataInstance.length - 1; i++) {
-						doubledata[i - 1] = Double.parseDouble(dataInstance[i]);
+						floatdata[i - 1] = Float.parseFloat(dataInstance[i]);
 					}
 
 					DataInstance res = new DataInstance();
 					res.label = label;
-					
-					float[] floatdata = new float[doubledata.length];
-					for(int x = 0; x < doubledata.length; x++) {
-						floatdata[x] = (float) doubledata[x];
-					}
 					res.measurements = floatdata;
 					
 					trainingData.get(label).add(res);
